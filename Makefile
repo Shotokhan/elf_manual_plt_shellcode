@@ -1,16 +1,17 @@
 CC := gcc
-CFLAGS :=
-LDFLAGS :=
+CFLAGS := -nostdlib
+LDFLAGS := -nostartfiles
 
 SRC_DIR := src
 OBJ_DIR := obj
 BIN_DIR := bin
 
-# Get all source files in the directory (excluding the top-level file)
-SRC_FILES := $(filter-out $(SRC_DIR)/$(TOP_LEVEL), $(wildcard $(SRC_DIR)/*.c))
+# Get all source files in the directory (including both .c and .S files)
+SRC_FILES := $(wildcard $(SRC_DIR)/*.c) $(wildcard $(SRC_DIR)/*.S)
 
 # Create object file names for all source files
-OBJ_FILES := $(patsubst $(SRC_DIR)/%.c, $(OBJ_DIR)/%.o, $(SRC_FILES))
+OBJ_FILES := $(patsubst $(SRC_DIR)/%.c, $(OBJ_DIR)/%.o, $(filter %.c, $(SRC_FILES))) \
+             $(patsubst $(SRC_DIR)/%.S, $(OBJ_DIR)/%.o, $(filter %.S, $(SRC_FILES)))
 
 # Specify the top-level file (default is "main.c")
 TOP_LEVEL ?= main.c
@@ -27,6 +28,10 @@ $(TARGET): $(OBJ_FILES)
 	$(CC) $(CFLAGS) $^ -o $@ $(LDFLAGS)
 
 $(OBJ_DIR)/%.o: $(SRC_DIR)/%.c
+	@mkdir -p $(OBJ_DIR)
+	$(CC) $(CFLAGS) -c $< -o $@
+
+$(OBJ_DIR)/%.o: $(SRC_DIR)/%.S
 	@mkdir -p $(OBJ_DIR)
 	$(CC) $(CFLAGS) -c $< -o $@
 

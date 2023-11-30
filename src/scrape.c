@@ -1,4 +1,5 @@
 #include "scrape.h"
+#include "enums.h"
 
 
 uint32_t fnv1a_32(const char *data) {
@@ -15,7 +16,7 @@ uint32_t fnv1a_32(const char *data) {
     return hash;
 }
 
-int memcmp(const void *s1, const void *s2, size_t n) {
+int _memcmp(const void *s1, const void *s2, size_t n) {
     const unsigned char *p1 = s1, *p2 = s2;
     for (size_t i = 0; i < n; ++i) {
         if (p1[i] < p2[i]) return -1;
@@ -27,7 +28,7 @@ int memcmp(const void *s1, const void *s2, size_t n) {
 uint64_t find_exported_function_offset(const void *elf_data, uint32_t hash) {
     const Elf64_Ehdr *elf_header = (const Elf64_Ehdr *)elf_data;
 
-    if (memcmp(elf_header->e_ident, ELFMAG, SELFMAG) != 0 || elf_header->e_ident[EI_CLASS] != ELFCLASS64 || elf_header->e_type != ET_EXEC) {
+    if (_memcmp(elf_header->e_ident, ELFMAG, SELFMAG) != 0 || elf_header->e_ident[EI_CLASS] != ELFCLASS64 || elf_header->e_type != ET_EXEC) {
         return SYMBOL_NOT_FOUND; // Not a valid ELF64 executable
     }
 

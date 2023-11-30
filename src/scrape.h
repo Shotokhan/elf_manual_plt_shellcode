@@ -1,5 +1,8 @@
+#ifndef SCRAPE_H
+#define SCRAPE_H
+
 #include <elf.h>
-#include <stddef.h>
+#include "types.h"
 
 #define SYMBOL_NOT_FOUND -1
 
@@ -14,6 +17,7 @@
 
 uint32_t fnv1a_32(const char *data);
 
-int memcmp(const void *s1, const void *s2, size_t n);
+int _memcmp(const void *s1, const void *s2, size_t n);
 
 uint64_t find_exported_function_offset(const void *elf_data, uint32_t hash);
+#endif
