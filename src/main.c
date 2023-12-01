@@ -20,16 +20,17 @@ int main() {
     if (libc_base == NULL) {
         return 1;
     }
-    // TODO: find out why it goes into segmentation fault
-    // TODO: tweak compilation options in Makefile
+    // TODO: the exported function is not found (properly), fix it
+    // TODO: tweak compilation options in Makefile (also to optimize code size, like removing unused code)
     // TODO: analyze the binary to check that the code in .text area does not need other sections
     // TODO: develop a script to extract the shellcode from the binary
     // TODO: develop a loader for the shellcode
-    uint64_t printf_offset = find_exported_function_offset(libc_base, FNV1A_32_HASH("printf"));
+    // TODO: describe ALL the techniques used in terms of code and compilation to achieve the result
+    uint64_t printf_offset = find_exported_function_offset(libc_base, printf_hash);
     if (printf_offset == SYMBOL_NOT_FOUND) {
         return 2;
     }
-    uint64_t strlen_offset = find_exported_function_offset(libc_base, FNV1A_32_HASH("strlen"));
+    uint64_t strlen_offset = find_exported_function_offset(libc_base, strlen_hash);
     if (strlen_offset == SYMBOL_NOT_FOUND) {
         return 3;
     }

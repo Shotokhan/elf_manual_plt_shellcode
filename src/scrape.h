@@ -15,6 +15,15 @@
     hash; \
 })
 
+// Being able to compute the hashes at compile-time is compiler-dependant.
+// For example, Rust compiler (clang) is able to do it fine.
+// For the sake of portability, I pre-computed the hashes and used an enum.
+// As such, the macro FNV1A_32_HASH is not used anymore.
+enum {
+    printf_hash = 0xe76fb4aa,   // FNV1A_32_HASH("printf")
+    strlen_hash = 0x58ba3d97    // FNV1A_32_HASH("strlen")
+};
+
 uint32_t fnv1a_32(const char *data);
 
 int _memcmp(const void *s1, const void *s2, size_t n);

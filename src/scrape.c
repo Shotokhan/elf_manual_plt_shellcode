@@ -28,9 +28,12 @@ int _memcmp(const void *s1, const void *s2, size_t n) {
 uint64_t find_exported_function_offset(const void *elf_data, uint32_t hash) {
     const Elf64_Ehdr *elf_header = (const Elf64_Ehdr *)elf_data;
 
+    /*
+    // This fails for some reason, also it makes use of global area for the magic bytes of the ELF
     if (_memcmp(elf_header->e_ident, ELFMAG, SELFMAG) != 0 || elf_header->e_ident[EI_CLASS] != ELFCLASS64 || elf_header->e_type != ET_EXEC) {
         return SYMBOL_NOT_FOUND; // Not a valid ELF64 executable
     }
+    */
 
     const Elf64_Shdr *section_headers = (const Elf64_Shdr *)(elf_data + elf_header->e_shoff);
     const char *strtab = NULL;
