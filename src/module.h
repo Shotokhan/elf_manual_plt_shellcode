@@ -6,6 +6,5 @@
 
 typedef struct {
     printf _printf;
-    strlen _strlen;
 } FuncStruct;
 #endif

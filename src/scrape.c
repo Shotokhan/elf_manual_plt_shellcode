@@ -28,48 +28,28 @@ int _memcmp(const void *s1, const void *s2, size_t n) {
 uint64_t find_exported_function_offset(const void *elf_data, uint32_t hash) {
     const Elf64_Ehdr *elf_header = (const Elf64_Ehdr *)elf_data;
 
-    /*
-    // This fails for some reason, also it makes use of global area for the magic bytes of the ELF
-    if (_memcmp(elf_header->e_ident, ELFMAG, SELFMAG) != 0 || elf_header->e_ident[EI_CLASS] != ELFCLASS64 || elf_header->e_type != ET_EXEC) {
-        return SYMBOL_NOT_FOUND; // Not a valid ELF64 executable
-    }
-    */
-
     const Elf64_Shdr *section_headers = (const Elf64_Shdr *)(elf_data + elf_header->e_shoff);
-    const char *strtab = NULL;
 
-    // Find the section containing symbol names (usually .dynstr or .strtab)
+    // Find the section containing the dynamic symbol table (usually .dynsym)
+    const Elf64_Shdr *dynsym_header = NULL;
     for (int i = 0; i < elf_header->e_shnum; ++i) {
-        if (section_headers[i].sh_type == SHT_STRTAB) {
-            strtab = (const char *)(elf_data + section_headers[i].sh_offset);
+        if (section_headers[i].sh_type == SHT_DYNSYM) {
+            dynsym_header = &section_headers[i];
             break;
         }
     }
 
-    if (!strtab) {
-        return SYMBOL_NOT_FOUND; // No string table found
+    if (!dynsym_header) {
+        return SYMBOL_NOT_FOUND; // No dynamic symbol table found
     }
 
-    // Find the section containing the symbol table (usually .dynsym or .symtab)
-    const Elf64_Shdr *symtab_header = NULL;
-    for (int i = 0; i < elf_header->e_shnum; ++i) {
-        if (section_headers[i].sh_type == SHT_SYMTAB) {
-            symtab_header = &section_headers[i];
-            break;
-        }
-    }
-
-    if (!symtab_header) {
-        return SYMBOL_NOT_FOUND; // No symbol table found
-    }
-
-    const Elf64_Sym *symtab = (const Elf64_Sym *)(elf_data + symtab_header->sh_offset);
+    const Elf64_Sym *dynsym = (const Elf64_Sym *)(elf_data + dynsym_header->sh_offset);
 
     // Find the symbol by hash
-    for (int i = 0; i < symtab_header->sh_size / sizeof(Elf64_Sym); ++i) {
-        const char *symbol_name = strtab + symtab[i].st_name;
-        if (fnv1a_32(symbol_name) == hash) {
-            return (uint64_t)symtab[i].st_value;
+    for (int i = 0; i < dynsym_header->sh_size / sizeof(Elf64_Sym); ++i) {
+        const char *symbol_name = (const char *)(elf_data + section_headers[dynsym_header->sh_link].sh_offset + dynsym[i].st_name);
+        if (fnv1a_32(symbol_name) == hash && ELF64_ST_TYPE(dynsym[i].st_info) == STT_FUNC) {
+            return (uint64_t)dynsym[i].st_value;
         }
     }
 

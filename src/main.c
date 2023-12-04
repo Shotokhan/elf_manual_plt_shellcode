@@ -20,7 +20,7 @@ int main() {
     if (libc_base == NULL) {
         return 1;
     }
-    // TODO: the exported function is not found (properly), fix it
+    // TODO: printf must be called with the proper calling convention (cdecl); design a good solution for that
     // TODO: tweak compilation options in Makefile (also to optimize code size, like removing unused code)
     // TODO: analyze the binary to check that the code in .text area does not need other sections
     // TODO: develop a script to extract the shellcode from the binary
@@ -30,15 +30,10 @@ int main() {
     if (printf_offset == SYMBOL_NOT_FOUND) {
         return 2;
     }
-    uint64_t strlen_offset = find_exported_function_offset(libc_base, strlen_hash);
-    if (strlen_offset == SYMBOL_NOT_FOUND) {
-        return 3;
-    }
     FuncStruct func_struct;
     func_struct._printf = libc_base + printf_offset;
-    func_struct._strlen = libc_base + strlen_offset;
     char program_name[] = "runtime_plt";
     char _format[] = "Program name: %s, length: %d\n";
-    func_struct._printf(_format, program_name, func_struct._strlen(program_name));
+    func_struct._printf(_format, program_name, sizeof(program_name));
     return 0;
 }
