@@ -1,6 +1,6 @@
 CC := gcc
-CFLAGS := -nostdlib
-LDFLAGS := -nostartfiles
+CFLAGS := -nostdlib -ffunction-sections -Wl,--gc-sections
+LDFLAGS := -nostartfiles -T linker_script.ld
 
 SRC_DIR := src
 OBJ_DIR := obj
@@ -19,6 +19,9 @@ TOP_LEVEL ?= main.c
 # Specify the final executable name
 TARGET := $(BIN_DIR)/$(basename $(notdir $(TOP_LEVEL)))
 
+# Specify the tester path
+TEST := test/loader.c
+
 .PHONY: all clean
 
 all: $(TARGET)
@@ -26,6 +29,8 @@ all: $(TARGET)
 $(TARGET): $(OBJ_FILES)
 	@mkdir -p $(BIN_DIR)
 	$(CC) $(CFLAGS) $^ -o $@ $(LDFLAGS)
+	$(CC) --version | head -n1 > $(BIN_DIR)/version.txt
+	objcopy --dump-section .text=$(BIN_DIR)/shellcode $@
 
 $(OBJ_DIR)/%.o: $(SRC_DIR)/%.c
 	@mkdir -p $(OBJ_DIR)
@@ -37,3 +42,10 @@ $(OBJ_DIR)/%.o: $(SRC_DIR)/%.S
 
 clean:
 	rm -rf $(OBJ_DIR) $(BIN_DIR)
+
+inspect: $(BIN_DIR)/shellcode
+	objdump -D $(TARGET)
+	objdump -M intel,x86-64 -b binary -D -mi386 $(BIN_DIR)/shellcode
+
+loader: $(BIN_DIR)/shellcode
+	$(CC) $(TEST) -o $(BIN_DIR)/loader

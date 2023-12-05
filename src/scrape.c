@@ -16,6 +16,7 @@ uint32_t fnv1a_32(const char *data) {
     return hash;
 }
 
+/*
 int _memcmp(const void *s1, const void *s2, size_t n) {
     const unsigned char *p1 = s1, *p2 = s2;
     for (size_t i = 0; i < n; ++i) {
@@ -24,6 +25,7 @@ int _memcmp(const void *s1, const void *s2, size_t n) {
     }
     return 0;
 }
+*/
 
 uint64_t find_exported_function_offset(const void *elf_data, uint32_t hash) {
     const Elf64_Ehdr *elf_header = (const Elf64_Ehdr *)elf_data;

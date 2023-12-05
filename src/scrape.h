@@ -21,12 +21,11 @@
 // As such, the macro FNV1A_32_HASH is not used anymore.
 enum {
     printf_hash = 0xe76fb4aa,   // FNV1A_32_HASH("printf")
-    strlen_hash = 0x58ba3d97    // FNV1A_32_HASH("strlen")
 };
 
 uint32_t fnv1a_32(const char *data);
 
-int _memcmp(const void *s1, const void *s2, size_t n);
+// int _memcmp(const void *s1, const void *s2, size_t n);
 
 uint64_t find_exported_function_offset(const void *elf_data, uint32_t hash);
 #endif
