@@ -16,8 +16,6 @@ void __attribute__((section(".text.startup"))) _start() {
 }
 
 int main() {
-    // TODO: describe ALL the techniques used in terms of code and compilation to achieve the results
-
     // mmaped_libc_base is only for the function scraping. In fact, in order to call libc functions, libc needs to be initialized.
     // Calling libc functions of a library that was only mmap-ed results in segmentation faults.
     // At the same time, the libc that is loaded at runtime has got the section headers stripped, so the scraping can't be done on it.

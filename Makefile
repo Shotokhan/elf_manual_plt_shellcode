@@ -2,6 +2,8 @@ CC := gcc
 CFLAGS := -nostdlib -ffunction-sections -Wl,--gc-sections
 LDFLAGS := -nostartfiles -T linker_script.ld
 
+LD := ldd
+
 SRC_DIR := src
 OBJ_DIR := obj
 BIN_DIR := bin
@@ -29,7 +31,8 @@ all: $(TARGET)
 $(TARGET): $(OBJ_FILES)
 	@mkdir -p $(BIN_DIR)
 	$(CC) $(CFLAGS) $^ -o $@ $(LDFLAGS)
-	$(CC) --version | head -n1 > $(BIN_DIR)/version.txt
+	$(CC) --version | head -n1 > $(BIN_DIR)/versions.txt
+	$(LD) --version | head -n1 >> $(BIN_DIR)/versions.txt
 	objcopy --dump-section .text=$(BIN_DIR)/shellcode $@
 
 $(OBJ_DIR)/%.o: $(SRC_DIR)/%.c

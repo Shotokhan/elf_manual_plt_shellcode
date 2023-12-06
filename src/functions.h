@@ -4,6 +4,6 @@
 #include "types.h"
 
 
-typedef int (*printf)(const char* __format, ...);
+typedef int (__attribute__((__cdecl__)) *printf)(const char* __format, ...);
 
 #endif
